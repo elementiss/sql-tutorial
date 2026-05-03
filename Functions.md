@@ -77,3 +77,69 @@ SELECT QUARTER(GETDATE()) FROM dbo.iq_dummy
 ```
 
 ## Строки и текст
+
+LEN – повертає довжину рядка. синоним LENGTH = BYTE_LENGTH, есть еще CHAR_LENGTH
+
+TRIM, LTRIM, RTRIM – видаляє відступи зліва і справа або лише з однієї сторони.
+
+LEFT – виводить вказану кількість символів з лівого краю рядка. 
+
+RIGHT діє аналогічно для правого краю.
+
+[SUBSTRING(s, start, length)](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/81fdb87b6ce21014aee8bcac40855664.html?locale=en-US) – вирізає із рядка частину певної довжини, починаючи з вказаного символу. Синоним SUBSTR
+
+REPLACE(s, что, на-что-заменять) – замінює частину рядка на вказаний текст. заменяет все вхождения
+
+PATINDEX('%pattern%', s) – знаходить позицію (номер по порядку) для першого входження певного шаблону в рядку. Працює по типу LIKE. Если не найдено, возвращает 0. Поддерживает:
+
+- `%` - любая строка, в том числе пустая
+- `_` - один символ
+- `[]` - Any single character in the specified range or set. Например `LIKE 'sm[iy]th'`, `LIKE '[a-r]ough'`
+- `[^]` - Any single character not in the specified range or set
+- экранирование `[[]` - просто символ `[`, `[_]`,`[%]`,`[^]`
+
+CHARINDEX(что, s) – знаходить позицію (номер по порядку) для першого входження шуканого тексту в рядку.
+
+LOCATE – знаходить позицію (номер по порядку) шуканого тексту в рядку. Для цієї функції можна задати позицію, з якої потрібно почати шукати.
+
+UPPER – переводить всі символи в рядку в верхній регістр.
+
+LOWER - переводить всі символи в рядку в нижній регістр.
+
+CHAR – на вхід приймає число від 0 до 255, повертає відповідний символ https://www.ascii-code.com/CP1251
+
+ASCII – повертає числове значення відповідно ASCII первого символа строки или 0 для пустой строки
+
+```sql
+SELECT LENGTH( 'chocolate' ); -- 9
+
+SELECT LEFT('Example', 3) FROM dbo.iq_dummy  -- Exa
+SELECT SUBSTRING('Cut example', 5, 7) FROM dbo.iq_dummy
+
+SELECT REPLACE('Example', 'ple', ‘EN') FROM dbo.iq_dummy
+SELECT REPLACE(REPLACE('K1,; K2', '; ', ''), ' ', '') FROM dbo.iq_dummy
+
+SELECT PATINDEX('_xam%', 'Example') FROM dbo.iq_dummy
+SELECT PATINDEX( '%hoco%', 'chocolate' ); -- 2
+SELECT PATINDEX( '%4_5_', '0a1A 2a3A 4a5A' ); -- 11
+
+SELECT CHARINDEX('SQL','Learn SQL') FROM dbo.iq_dummy
+WHERE CHARINDEX( 'K', Surname ) = 1 -- начинается на K
+
+SELECT LOCATE('example exam', 'ex', 5) FROM dbo.iq_dummy
+SELECT LOCATE(
+   'office party this week ...', 'party', 2);  -- 8
+
+SELECT UPPER('Test string') FROM dbo.iq_dummy
+SELECT LOWER('Learn SQL') FROM dbo.iq_dummy
+
+SELECT CHAR(70) FROM dbo.iq_dummy
+SELECT ASCII('K'), ASCII('К') FROM dbo.iq_dummy
+SELECT ASCII('Київ') FROM dbo.iq_dummy
+
+```
+Следующее выражение можно использовать для извлечения всего до и включая первый неалфавитно-цифровой символ в строке:
+
+```sql
+SELECT LEFT( @string, PATINDEX( '%[^a-zA-Z0-9]%', @string ) );
+```
