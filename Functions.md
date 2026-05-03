@@ -1,5 +1,9 @@
 # Функции и переменные в Sql Anywhere. Оператор CASE
 
+
+> [!NOTE]
+> В презентации ссылается на документацию [SyBooks Online](https://infocenter.sybase.com/help/index.jsp?topic=%2Fcom.sybase.help.sqlanywhere.12.0.1%2Fdbusage%2Fug-olap-s-51258147.html)
+
 ## Дата-время
 
 `GETDATE()` - текущее время и дата
@@ -252,6 +256,11 @@ SET @Example = '2020-01-01';
 Можна присвоїти значення відразу після оголошення змінної
 ```sql
 DECLARE @StartDate DATE = '2020-01-01';
+```
+
+Сохранение результата запроса в переменной:
+```
+declare @DateEnd date = (select getdate()+1 from dbo.iq_dummy).
 ```
 
 Примеры - не проверяла
