@@ -76,6 +76,12 @@ SELECT MONTHNAME(GETDATE()) FROM dbo.iq_dummy
 SELECT QUARTER(GETDATE()) FROM dbo.iq_dummy
 ```
 
+Еще есть в доке
+
+- DATE(выражение) - возвращает дату, отбрасывает время
+- TODAY() - текущая дата
+- NOW(*) - время и дата
+
 ## Строки и текст
 
 LEN – повертає довжину рядка. синоним LENGTH = BYTE_LENGTH, есть еще CHAR_LENGTH
@@ -209,6 +215,20 @@ SELECT HEXTOINT('0x00000003')
 SELECT INTTOHEX(3)
 ```
 
+##  COALESCE
+
+[COALESCE](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/81f4a26b6ce21014959b96490ac5f8fe.html?locale=en-US)
+
+В функцию необходимо передать не менее двух выражений, и все выражения должны быть сравнимыми.
+
+возвращает первое не-NULL выражение из списка.
+
+Результат равен NULL только в том случае, если все аргументы равны NULL.
+
+```sql
+SELECT COALESCE( NULL, 34, 13, 0 ); -- 34
+```
+
 ## Переменные
 
 Змінна це об’єкт, який зберігає деяке значення.
@@ -219,36 +239,73 @@ SELECT INTTOHEX(3)
 
 Для створення змінних використовуються команди `DECLARE` або `CREATE VARIABLE`.
 
-Перша створить змінну в рамках поточного запиту, яка буде недоступною після
-його завершення, друга створить змінну доступну протягом існуючого підключення.
+[DECLARE](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/816dc0576ce210149edaa1e0e7ff651c.html?locale=en-US) створить змінну в рамках поточного запиту, яка буде недоступною після
+його завершення, [CREATE VARIABLE](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/816d2ee66ce2101495f2da956754df03.html?locale=en-US) створить змінну доступну протягом існуючого підключення.
 
 Для присвоєння значення змінній використовується оператор `SET`.
 
 ```sql
 DECLARE @Example DATE;
-SET @Example = ‘2020-01-01’;
+SET @Example = '2020-01-01';
 ```
 
 Можна присвоїти значення відразу після оголошення змінної
 ```sql
-DECLARE @StartDate DATE = ‘2020-01-01’;
+DECLARE @StartDate DATE = '2020-01-01';
 ```
 
+Примеры - не проверяла
+```
+DECLARE @Counter INT = 0;
+DECLARE @Name NVARCHAR(100) = 'Test';
+SET @Counter = @Counter + 1;
+SELECT @Name;
+--
+declare @veryhigh money 
+select @veryhigh = max (price) 
+    from titles
+--
+SELECT COUNT(*) INTO @counter 
+    FROM Customers 
+    WHERE City = 'Berlin';
+```
+
+В SAP Sybase ASE и SQL Server переменные надо начинать с @, в SQl Anywhere - не надо. ASE (Adaptive Server Enterprise)
+
+@ позволяет чётко отличать переменные от имён колонок, таблиц и литералов.
 
 ## Оператор CASE 
 
-Оператор CASE в залежності від вказаних умов повертає одне з множини можливих значень.
+Оператор [CASE](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/3be45efb6c5f1014bd8df5da41b23288.html?locale=en-US) в залежності від вказаних умов повертає одне з множини можливих значень.
 
 ```sql
-SELECT CASE
-  WHEN Column1 <= 100 THEN ‘Less 100’
-  ELSE ‘More 100’
+-- 1 форма
+CASE expression
+    WHEN value1 THEN result1
+    WHEN value2 THEN result2
+    ...
+    ELSE default_result
 END
-FROM Table1
-```
 
-У вказаному прикладі всі записи з Column1 менші або рівні 100
-будуть промарковані як ‘Less 100’, а ті, що більші - ‘More 100’.
+-- 2 форма
+CASE
+  WHEN [ условие | NULL] THEN statement-list ...
+  WHEN [ условие | NULL] THEN statement-list ...
+  ELSE statement-list 
+END [ CASE ]
+
+
+SELECT 
+    customer_id,
+    order_amount,
+    CASE 
+        WHEN order_amount >= 1000 THEN 'VIP'
+        WHEN order_amount >= 500  THEN 'Premium'
+        WHEN order_amount >= 100  THEN 'Standard'
+        ELSE 'New'
+    END AS customer_segment
+FROM orders;
+```
 
 Значення в CASE повинні бути одного типу. Неможна перетворювати в
 число, текст і дату, лише в щось одне в рамках одного CASE.
@@ -256,3 +313,68 @@ FROM Table1
 Конструкцію CASE можна використовувати не лише тільки для
 створення нових стовпців, але і в умовах WHERE і в об’єднанні таблиць
 
+Пример: CASE в агрегатных функциях
+
+```sql
+SELECT 
+    department,
+    COUNT(*) AS total_employees,
+    SUM(CASE WHEN gender = 'M' THEN 1 ELSE 0 END) AS male_count,
+    SUM(CASE WHEN gender = 'F' THEN 1 ELSE 0 END) AS female_count,
+    AVG(CASE WHEN salary > 80000 THEN salary END) AS high_salary_avg
+FROM employees
+GROUP BY department;
+```
+
+Пример в UPDATE
+```sql
+UPDATE employees
+SET bonus = 
+    CASE 
+        WHEN performance_rating = 'A' THEN salary * 0.20
+        WHEN performance_rating = 'B' THEN salary * 0.15
+        WHEN performance_rating = 'C' THEN salary * 0.05
+        ELSE 0
+    END
+WHERE hire_date >= '2024-01-01';
+```
+
+Пример. CASE в ORDER BY (приоритетная сортировка)
+
+```sql
+SELECT * FROM tasks
+ORDER BY 
+    CASE status
+        WHEN 'Critical' THEN 1
+        WHEN 'High'     THEN 2
+        WHEN 'Medium'   THEN 3
+        ELSE 4
+    END,
+    due_date ASC;
+```
+
+Если ELSE не указан и ни одно условие не выполнилось → возвращается `NULL`.
+
+Проверка на IS NULL
+
+```
+SELECT 
+    name,
+    CASE 
+        WHEN middle_name IS NULL THEN 'Нет отчества'
+        WHEN middle_name = '' THEN 'Пустое отчество'
+        ELSE middle_name
+    END AS middle_name_status
+FROM customers;
+```
+
+CASE вычисляется последовательно сверху вниз. Ставьте самые вероятные/дешёвые условия первыми.
+
+Еще есть в доке [IF Statement](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/8171069a6ce210148e5b8c02ad6d4fdb.html?locale=en-US)
+
+```sql
+IF условие THEN statement-list
+[ ELSEIF { условие | operation-type } THEN statement-list ] ...
+[ ELSE statement-list ]
+{ END IF | ENDIF }
+```
