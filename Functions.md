@@ -116,7 +116,7 @@ SELECT LENGTH( 'chocolate' ); -- 9
 SELECT LEFT('Example', 3) FROM dbo.iq_dummy  -- Exa
 SELECT SUBSTRING('Cut example', 5, 7) FROM dbo.iq_dummy
 
-SELECT REPLACE('Example', 'ple', ‘EN') FROM dbo.iq_dummy
+SELECT REPLACE('Example', 'ple', 'EN') FROM dbo.iq_dummy
 SELECT REPLACE(REPLACE('K1,; K2', '; ', ''), ' ', '') FROM dbo.iq_dummy
 
 SELECT PATINDEX('_xam%', 'Example') FROM dbo.iq_dummy
@@ -142,4 +142,69 @@ SELECT ASCII('Київ') FROM dbo.iq_dummy
 
 ```sql
 SELECT LEFT( @string, PATINDEX( '%[^a-zA-Z0-9]%', @string ) );
+```
+
+## Числа 
+
+ROUND – заокруглює число до вказаної кількості після коми.
+
+ABS – повертає модуль числа.
+
+POWER – підносить число у вказану степінь.
+
+ISNUMERIC – визначає чи є значення числом.
+
+```sql
+SELECT ROUND(1234.5678, 2) FROM dbo.iq_dummy
+SELECT ABS(-123) FROM dbo.iq_dummy
+SELECT POWER(3, 2) FROM dbo.iq_dummy
+SELECT ISNUMERIC(12.34) FROM dbo.iq_dummy
+SELECT ISNUMERIC('24') FROM dbo.iq_dummy
+SELECT ISNUMERIC('Learn SQL') FROM dbo.iq_dummy
+```
+
+При математичних операціях Sybase округляє значення. Щоб цього уникнути є
+невеличкий «лайфхак» – множення на 1.0
+
+```sql
+SELECT TOP 1 1.0*ininum/iniden FROM dbo.tb_sc_vRates
+```
+
+Також, через округлення, можна використовувати такі умови:
+
+```sql
+WHERE TopicID/100 = 26
+```
+
+## Приведение типов
+
+Для перетворення типів використовують функції `CAST` і `CONVERT`.
+
+[CAST](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/81f441b06ce210149ce9bffbc27402fc.html?locale=en-US) перетворює вказане значення у вибраний тип.
+
+[CONVERT](https://help.sap.com/docs/SAP_SQL_Anywhere/93079d4ba8e44920ae63ffb4def91f5b/81f4f0cf6ce21014aa7eddf86712f7b1.html?locale=en-US) робить те ж саме, але має можливість задати точний формат.
+
+```sql
+SELECT CAST(123 AS varchar(3)) FROM dbo.iq_dummy
+SELECT CAST( '2000-10-31' AS DATE );
+SELECT CAST( 1 + 2 AS CHAR );
+SELECT CAST ( 'Surname' AS CHAR(5) ); -- обрезка строки
+
+SELECT CONVERT(VARCHAR(10), GETDATE(), 104) FROM dbo.iq_dummy
+SELECT CONVERT( integer, 5.2 );  -- 5
+```
+
+- 104 это dd.mm.yy[yy]
+- 103 это dd/mm/yy[yy]
+- 102 это [yy]yy.mm.dd
+- 108 это hh:nn:ss и др
+
+В більшості випадків достатньо CAST, але для дат частіше всього лише
+CONVERT може правильно виконати перетворення.
+
+Окремо для чисел в шістнадцятирічній системі є наступні команди перетворення:
+
+```sql
+SELECT HEXTOINT('0x00000003')
+SELECT INTTOHEX(3)
 ```
