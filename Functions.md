@@ -258,9 +258,10 @@ SET @Example = '2020-01-01';
 DECLARE @StartDate DATE = '2020-01-01';
 ```
 
-Сохранение результата запроса в переменной:
+Сохранение результата запроса в переменной (запрос обязательно брать в круглые скобки, иначе ошибка):
 ```
-declare @DateEnd date = (select getdate()+1 from dbo.iq_dummy).
+declare @DateEnd date = (select getdate()+1 from dbo.iq_dummy)
+select @DateEnd
 ```
 
 Примеры - не проверяла
