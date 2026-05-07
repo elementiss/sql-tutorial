@@ -85,9 +85,28 @@ ORDER BY RowNum;
 - Выбор топ-N в каждой группе
 
 
-## RANK 
+## RANK, DENSE_RANK
 
-## DENSE_RANK
+Тоже для нумерации строк.
+
+```sql
+SELECT Column1,
+  RANK() OVER (PARTITION BY Column0 ORDER BY Column1 ASC)
+  FROM Table1
+
+SELECT Column1,
+  DENSE_RANK() OVER (PARTITION BY Column0 ORDER BY Column1 DESC)
+  FROM Table1
+```
+
+Різниця між цими трьома варіантами у роботі з дублікатами.
+
+- `ROW_NUMBER` здійснить послідовну нумерацію незалежно від наявності дублікатів (1,2,3,4)
+- `DENSE_RANK` для дублікатів поверне однакові номери, при цьому нумерація буде
+послідовною, без ‘прогалини’ після дублікатів (1,1,2,3)
+- `RANK` для дублікатів поверне однакові номери, після дублікатів буде ‘прогалина’ в
+нумерації (1,1,3,4)
+
 
 ## LAG
 
