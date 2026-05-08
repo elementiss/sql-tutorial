@@ -291,3 +291,21 @@ FROM employees;
 
 ## FIRST_VALUE, LAST_VALUE
 
+Для вибору попереднього або наступного значення із стовпця
+використовуються команди `LAG` (попереднє) та `LEAD` (наступне).
+
+```sql
+SELECT Column1, LAG (Column1) OVER (ORDER BY Column1) FROM Table1
+SELECT Column1, LEAD (Column1) OVER (ORDER BY Column1) FROM Table1
+```
+
+Для вибору першого або останнього запису із значень поля
+використовуються команди `FIRST_VALUE` и `LAST_VALUE`.
+
+```sql
+SELECT FIRST_VALUE (Column1) OVER (ORDER BY Column2) FROM Table1
+SELECT LAST_VALUE (Column1) OVER (ORDER BY Column2) FROM Table1
+```
+
+Ці команди корисні при побудові довідника дат, коли для дати зміни
+потрібно створити поля з датами початку і закінчення дії.
