@@ -10,6 +10,8 @@
 
 <details><summary> Решение </summary>
 
+[Online Editor](https://onecompiler.com/sqlite/44p8f3dck)
+
 ```sql
 SELECT c1, c2-
   (CASE
