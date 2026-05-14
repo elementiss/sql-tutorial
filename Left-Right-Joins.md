@@ -27,4 +27,13 @@ FROM
   on c1=o1
 ```
 
+Общий остаток денег (одно число):
+
+```sql
+SELECT
+  (SELECT sum(inc) FROM Income_o)
+  -
+  (SELECT sum(out) FROM Outcome_o)
+AS remain
+```
 </details>
