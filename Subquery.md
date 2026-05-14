@@ -255,6 +255,22 @@ where salary = (Select min(salary) from employees)
 ```
 </details>
 
+
+## Задача 11.
+
+Найти максимальную среднюю зарплату среди всех отделов.
+
+<details><summary> Решение </summary>
+
+```sql
+SELECT MAX(avg_salary)
+FROM (SELECT department_id, AVG(salary) AS avg_salary 
+      FROM employees 
+      GROUP BY department_id) AS dept_averages;
+```
+</details>
+
+
 ## CTE и оператор `WITH`
 
 Обобщённое табличное выражение или CTE (Common Table Expressions) - это временный результирующий набор данных, к которому можно обращаться в последующих запросах. Для написания CTE используется оператор WITH.
