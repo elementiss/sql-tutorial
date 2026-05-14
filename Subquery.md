@@ -268,8 +268,25 @@ FROM (SELECT department_id, AVG(salary) AS avg_salary
       FROM employees 
       GROUP BY department_id) AS dept_averages;
 ```
+
+Вариант с функцией `RANK`:
+
+```sql
+WITH tmp AS (
+    SELECT 
+        d.name AS department_name, AVG(e.salary) AS avg_salary,
+        RANK() OVER (ORDER BY AVG(e.salary) DESC) AS rnk
+    FROM employees e
+    JOIN departments d ON e.department_id = d.id
+    GROUP BY d.id, d.name
+)
+SELECT department_name, avg_salary
+FROM tmp
+WHERE rnk = 1;
+```
 </details>
 
+----
 
 ## CTE и оператор `WITH`
 
