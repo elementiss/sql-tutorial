@@ -49,8 +49,6 @@ AS remain
 
 <details><summary> Решение </summary>
 
-[Online Editor](https://onecompiler.com/sqlite/44p8f3dck)
-
 ```sql
 Select distinct A.date, A.R, B.point, B.inc, C.point, C.out
 From
